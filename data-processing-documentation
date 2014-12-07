@@ -1,0 +1,35 @@
+1. Prepare separate pre-processed data-files for each participant and task
+//all correct files are now in allfiles3 folder
+// can use excel macro, but change name to outlier not outliers 
+
+2. Update metatable file
+
+3. Create whole data sheet //  run selected lines from the function in loadfrommetatable.R 
+bind the processed files into one dataframe and save as a file
+
+4. Process outliers //TODO - function, and file where it lies
+
+5. Analysis //TODO
+
+
+
+5.1 Model shift computation, and write to file
+5.2 COmparisons with model shift
+September for Co1months - head is missing - removing it from analysis in other files
+
+
+Notes: Some code is repeated - useful bits copied to loadfrommetatable.R file. 
+
+
+6. Graphs code will be in abalone-plotting.R file
+
+http://www.afterimage.comuf.com/vis/index.html
+
+
+7. some new ideas and experimentation in file furtherdataprocessing.R
+
+
+8. Pooled sd - good references here: 
+http://stackoverflow.com/questions/16974389/how-to-calculate-a-pooled-standard-deviation-in-r
+
+http://support.minitab.com/en-us/minitab/17/topic-library/basic-statistics-and-graphs/introductory-concepts/standard-deviation-variance-and-the-normal-distribution/pooled-sd/

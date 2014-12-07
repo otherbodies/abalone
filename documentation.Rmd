@@ -1,0 +1,194 @@
+
+---
+title: "Data Documentation"
+output: html_document
+---
+
+Date: `r as.character(Sys.Date())`
+
+
+### Description of files, and basic info about data
+
+
+```{r,echo=FALSE}
+#here load libraries and files for markdown code chunks
+library("knitr", lib.loc="~/R/win-library/3.1")
+library("ggplot2", lib.loc="~/R/win-library/3.1")
+
+setwd("~/RStudio-Projects/Abalone")
+load("data.Rda")
+```
+
+Pre processed data file with cleaned and formatted data from all participants: *wholedata.csv*
+
+Summary information about the participants is in the file *participants.csv*
+
+There are `r nrow(participantSummary)` participants, `r nrow(subset(participantSummary,type=="con"))` controls and `r nrow(subset(participantSummary,type=="syn"))` synaesthetes.
+
+`r nrow(subset(participantSummary,type=="con" & round=="both"))` controls and `r nrow(subset(participantSummary,type=="syn" & round=="both"))` synaesthetes did both rounds. 
+
+There are `r nrow(subset(wholedata,condition!="sys"))` datapoints (without the system and practice trials). 
+
+Data structure is:
+
+ - **m** : month name
+ - **z** : front/back dimension - distance from Kinect device in mm
+ - **X** : left/right - negative numbers on the participant's left, 0 in front of Kinect, positive numbers on the participant's right side 
+ - **y**: up/down - positive up / negative down / 0 - Kinect level
+ - **outlier** : coded as 0/1 where 1 means outlier
+ - **condition** : straight, head turn, body turn - coded as str/hd/tr
+ - **task** : month, crazy, mini
+ - **type**: control, synaesthete
+ - **participant** : participant code
+ - **rounds**: if participant did both rounds or only one, coded as - monthsOnly, crazyOnly, both
+
+
+### Outliers
+
+**System outliers**
+
+Outliers related to system failures (failing to record hand position properly) were removed. All points with distance from the Kinect greater than 3000mm were treated as outliers - mostly meaning that the system failed to measure hand position and measured a distance to lab room wall behind the participant. Also all trials with 0 distance were removed - as system coded 0 when failed to measure the distance at all. 
+
+All system outlier trials are listed in the file *systemOutliers.csv*
+
+There were `r nrow(systemOutlierCount)` system outliers, which is `r (100*nrow(systemOutlierCount)/nrow(subset(wholedata,condition!="sys")))`% of all data points. 
+
+
+**IMPORTANT: For Co1 months head condition all datapoints for September are outliers. This results in missing value for this month/condition in all subsequent analyses!** 
+
+
+**Standard deviation outliers**
+
+Normal outliers were computed without "mini" task, because for each condition in mini there is only one datapoint per month/participant/condition.
+
+For each datapoint we applied the following formula: 
+- We computed average position for participant/task/condition (i.e all data points for Co2/month/hd) - measure of center of distribution in 3d space
+- Then we computed average distance of datapoints from that position (measure of spread in 3d space) - we used formula for Euclidean distance in 3d space.
+- Then we compared the distance of each data point to that average distance
+- All points that were more than 2.5 times away from the center than the average distance were considered outliers 
+
+
+```{r echo=FALSE}
+numOutliers = nrow(advOutliers)
+#percentageOutliers = (100*numOutliers)/numDataPoints
+```
+
+List of those data points is in the file *advOutliers.csv*
+
+There were `r numOutliers` of them.
+
+All these datapoints were were removed from further analysis.
+
+
+
+### Data processing - basic summary statistics
+
+Following summary statistics were computed:
+
+- mean positon for each month/condition/task/participant : data in file *means.csv*
+- median positon for each month/condition/task/participant : data in file *medians.csv*
+- standard deviation for each month/condition/task/participant : data in file *sds.csv*
+- number of valid datapoints (after outlier removal) for each month/condition/task/participant : data in file *lengths.csv* 
+- average standard deviation (average of 12 separate month SD's) for each condition/task/participant : data in file *avofsds.csv*
+- standard deviation of standard deviations (SD of 12 separate month SD's) for each condition/task/participant : data in file *sdofsds.csv*
+
+Then, pooled SD's were computed for each participant/condition/task, by taking weighted average of each month SD's. The mini task was excluded, because there was only one data point per condition/month. Pooled SD data is in the file: *pooledsds.csv*
+
+Summary of pooled SD data: 
+"overall"" column is average of all the axes 
+
+```{r echo=FALSE, results='asis'}
+
+kable(pooledSummary, format="markdown")
+
+
+```
+
+
+Plot of pooled SD for each participant, averaged over conditions, and stacked by the task:
+
+```{r echo=FALSE, fig.width=12, fig.height=5}
+ggplot(sumpool,aes(x=participant,y=overall,fill=task))+geom_bar(stat="identity",position="dodge")
+```
+
+
+### Computing differences between conditions: straight vs. head, straight vs. trunk
+
+Here the list of ANOVAS or t-tests.
+
+Differences between mean position of each month/axis/condition/task/participant are in files:
+
+*differences_z_month_str_hd.csv*
+*differences_X_month_str_hd.csv*
+*differences_y_month_str_hd.csv*
+*differences_z_month_str_tr.csv*
+*differences_X_month_str_tr.csv*
+*differences_y_month_str_tr.csv*
+*differences_z_crazy_str_hd.csv*
+*differences_X_crazy_str_hd.csv*
+*differences_y_crazy_str_hd.csv*
+*differences_z_crazy_str_tr.csv*
+*differences_X_crazy_str_tr.csv*
+*differences_y_crazy_str_tr.csv*
+
+
+Results of t-tests and effect sizes are in the file *wholeDifferenceTests.csv*
+
+There are 141 test results.
+
+92 have p.value<0.05
+
+77 have p.value<0.01
+
+56 have p.value<0.001 
+
+
+### Model shift 
+
+We computed ideal expected distribution of data for each participant assuming given reference frame. 
+Three possible reference frames were modelled - head centered, trunk centered and room centered.
+
+If participant was using room RF, data points for each month in all conditions are expected to be placed in the same positons. 
+
+If head centered reference frame was used, participant's plot is expected to be shifted 45 deg to the right (from the plot in straight condition) in head turn trials, and remain close to straight plot in trunk turn trials. 
+
+If trunk centered RF was used, participant's plot is expected to be shifted 45 deg to the right in trunk turn trials, and remain close to straight plot in head turn trials. 
+
+
+NB: Distances between model and actual positions were computed on xz plane only. 
+
+
+## 45 deg expected position - adjustments
+
+Adjustments to the above described models can be made - some systematic noise can arise because of the difference between center of rotaion of the chair and the participant head - for trunk turn trials, and the difference between center of rotaton of the head, and participant eyes/face in head turn trials)
+
+Therefore, **if participant was using head centered RF**: in head turn trials, ideal predicted plot should be corrected for the distance between the eyes and center of rotation of the head. 
+
+In trunk turn trials, because of the distance between chair rotation point and participant's head, the ideal plot would not be expected at the same place as in straight condition, but offset to the left and forward. 
+
+**If participant was using trunk centered RF**: ideal predicted plot has to be corrected for trunk turn trials, taking into account the distance between chair rotation axis and participant trunk. 
+In head turn trials, the plot should be at the same place as in straight condition. 
+
+
+## final model fit data
+Adjusted and unadjusted model fit data were compared - using t-test for unadjusted best-fit and adjusted best-fit. There were no significant differences, therefore unadjusted algorithm was used to compute and analyze model fit  
+
+## main table (preliminary description)
+All reference frame measures for each participant are listed in the file *mainTable.csv*
+The variables are (separately for month and horse tasks):
+
+- head,trunk and room model fit
+- ratio of best model fit / next to best (reversed to show how many times best fit is better than next to best fit) 
+- angle of regression line - difference between angle in straight and head condition
+- angle of regression line - difference between angle in straight and trunk condition
+- difference between those two differences 
+
+
+```{r echo=FALSE, results='asis'}
+
+kable(mainTable, format="markdown")
+
+
+```
+
+
