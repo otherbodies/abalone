@@ -8,6 +8,13 @@ Date: `r as.character(Sys.Date())`
 
 
 ### Description of files, and basic info about data
+```{r setup, include=FALSE, cache=FALSE}
+options(scipen=999)
+```
+
+```{r global_options, include=FALSE}
+options(scipen=999)
+```
 
 
 ```{r,echo=FALSE}
@@ -17,6 +24,7 @@ library("ggplot2", lib.loc="~/R/win-library/3.1")
 
 setwd("~/RStudio-Projects/Abalone")
 load("data.Rda")
+load("data2.Rda")
 ```
 
 Pre processed data file with cleaned and formatted data from all participants: *wholedata.csv*
@@ -179,11 +187,17 @@ The variables are (separately for month and horse tasks):
 
 - head,trunk and room model fit
 - ratio of best model fit / next to best (reversed to show how many times best fit is better than next to best fit) 
+- which is best fit - head, room, or trunk
 - angle of regression line - difference between angle in straight and head condition
 - angle of regression line - difference between angle in straight and trunk condition
 - difference between those two differences 
-
-
+- furthest method angles - similarly to angles of regression lines
+- model fits based on reg line angles
+- "analyze_by" - which model is used in mixed analysis (some participants furthest, others reg)
+- "3dplot col"" - this is necessary for 3d plot colouring - ignore in the analysis
+- model fits based on furthest months 
+- "rounds" - who did both crazy and month, and who only crazy or month
+- fit-mixed
 ```{r echo=FALSE, results='asis'}
 
 kable(mainTable, format="markdown")
@@ -191,4 +205,125 @@ kable(mainTable, format="markdown")
 
 ```
 
+## cluster analysis and model fits
 
+Hierarchical clustering - based on furthest months. Text labels refer to which model (furthest month method) fitted best.
+
+<img src="cluster_fur.png">
+
+Hierarchical clustering - based on furthest months. Text labels refer to which model (old - distance based method) fitted best.
+
+<img src="cluster_fur_labels_oldmethod.png">
+
+Only participants who did both rounds (10/10)
+
+<img src="cluster_fur_didall.png">
+
+CLustering based on mixed fit (furthest for some and regression for others). Text labels refer to which model (old - distance based method) fitted best.
+
+<img src="cluster_mixed_fit.png">
+
+
+# MANOVA'S for cluster solutions
+
+**Manova for clusters based on furthest month (hierarchical and k-means give the same solution)**
+This is for all participants who did months
+                                           
+```{r}
+summary.manova(fitmanova, test="Wilks")
+```
+
+
+*Univariate F tests for each DV*
+
+ 
+```{r}
+summary.aov(fitmanova)
+```
+
+*Pairwise multivariate tests:* 
+
+                                            
+```{r}
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu, subset = bestfit_fur %in% c("head","trunk") ))
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu, subset = bestfit_fur %in% c("head","room") ))
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu, subset = bestfit_fur %in% c("room","trunk") ))
+```
+
+
+
+**Manova for mixed (some participants reg line angles, some furthest)**
+
+This is for all participants who did months. sa20,co3,co4,co9,sa21,sa24 analyzed with furthest month, the rest with reg line angles
+                                           
+```{r}
+summary.manova(fitmanova_mixed, test="Wilks")
+```
+
+
+*Univariate F tests for each DV*
+
+ 
+```{r}
+summary.aov(fitmanova_mixed)
+```
+
+*Pairwise multivariate tests:* 
+
+                                            
+```{r}
+summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu, subset = bestfit_month %in% c("head","trunk") ))
+summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu, subset = bestfit_month %in% c("head","room") ))
+summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu, subset = bestfit_month %in% c("room","trunk") ))
+```
+
+
+**Manova for clusters based on furthest month (hierarchical and k-means give the same solution)**
+This is for 10/10 participants 
+                                           
+```{r}
+summary.manova(fitmanova_fur_both, test="Wilks")
+```
+
+
+*Univariate F tests for each DV*
+
+ 
+```{r}
+summary.aov(fitmanova_fur_both)
+```
+
+*Pairwise multivariate tests:* 
+
+                                            
+```{r}
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu_both, subset = bestfit_fur %in% c("head","trunk") ))
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu_both, subset = bestfit_fur %in% c("head","room") ))
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu_both, subset = bestfit_fur %in% c("room","trunk") ))
+```
+
+
+**Manova for mixed (some participants reg line angles, some furthest)**
+
+This is for 10/10
+                                           
+```{r}
+summary.manova(fitmanova_mixed_both, test="Wilks")
+```
+
+
+*Univariate F tests for each DV*
+
+ 
+```{r}
+summary.aov(fitmanova_mixed_both)
+```
+
+*Pairwise multivariate tests:* 
+
+                                            
+```{r}
+summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu_both, subset = bestfit_month %in% c("head","trunk") ))
+summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu_both, subset = bestfit_month %in% c("head","room") ))
+summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu_both, subset = bestfit_month %in% c("room","trunk") ))
+```

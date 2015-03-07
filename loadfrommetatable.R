@@ -407,11 +407,100 @@ mainTable = merge(mainTable,mainTable7,by="participant")
 mainTable = merge(mainTable,mainTable8,by="participant")
 mainTable = merge(mainTable,mainTable9,by="participant")
 mainTable = merge(mainTable,mainTable10,by="participant")
-  colnames(mainTable)=c("participant","head-fit-horse","head-fit-month","trunk-fit-horse","trunk-fit-month","room-fit-horse","room-fit-month","ratio-crazy","ratio-month",
-"bestfit-horse","bestfit-month","angle-str-hd-crazy","angle-str-hd-month","angle-str-tr-crazy","angle-str-tr-month","angle-diff-of-diffs-crazy","angle-diff-of-diffs-month",
-"furthest-strhd-horse","furthest-strhd-month","furthest-strtr-horse","furthest-strtr-month","furthest-diffofdiffs-horse","furthest-diffofdiffs-month")
+  colnames(mainTable)=c("participant","head_fit_horse","head_fit_month","trunk_fit_horse","trunk_fit_month","room_fit_horse","room_fit_month","ratio_crazy","ratio_month",
+"bestfit_horse","bestfit_month","angle_str_hd_crazy","angle_str_hd_month","angle_str_tr_crazy","angle_str_tr_month","angle_diff_of_diffs_crazy","angle_diff_of_diffs_month",
+"furthest_strhd_horse","furthest_strhd_month","furthest_strtr_horse","furthest_strtr_month","furthest_diffofdiffs_horse","furthest_diffofdiffs_month","type")
+
+mainTable["type"]=NA
+mainTable$type[1:10]="control"
+mainTable$type[11:27]="synaesthete"
+
+#rel_trunk is trunk fit divided by mean of other two
+mainTable["rel_trunk"]=NA
+mainTable$rel_trunk=(mainTable$trunk_fit_month/((mainTable$head_fit_month+mainTable$room_fit_month)/2))
+mainTable["rel_head"]=NA
+mainTable$rel_head=(mainTable$head_fit_month/((mainTable$trunk_fit_month+mainTable$room_fit_month)/2))
+mainTable["rel_room"]=NA
+mainTable$rel_room=(mainTable$room_fit_month/((mainTable$head_fit_month+mainTable$trunk_fit_month)/2))
+
+#rel_trunk_conserv is trunk fit divided by the one with smaller difference from trunk fit
+#example:  min(c(abs(9-5),abs(9-11)))
+
+mainTable["rel_trunk_conserv"]=NA
+mainTable$rel_trunk_conserv = mainTable$trunk_fit_month/(min(c(abs(mainTable$trunk_fit_month-mainTable$head_fit_month),abs(mainTable$trunk_fit_month-mainTable$room_fit_month)  )   ))
+##
+
+##new fit based on regression line angles
+mainTable["trunk_fit_reg"]=NA
+mainTable$trunk_fit_reg = with(mainTable,abs(45-angle_str_tr_month)+abs(angle_str_hd_month))
+mainTable["head_fit_reg"]=NA
+mainTable$head_fit_reg = with(mainTable,abs(45-angle_str_hd_month)+abs(angle_str_tr_month))
+mainTable["room_fit_reg"]=NA
+mainTable$room_fit_reg = with(mainTable,abs(angle_str_tr_month)+abs(angle_str_hd_month))
+
+##new fit based on furthest point angles
+mainTable["trunk_fit_fur"]=NA
+mainTable$trunk_fit_fur = with(mainTable,abs(45-furthest_strtr_month)+abs(furthest_strhd_month))
+mainTable["head_fit_fur"]=NA
+mainTable$head_fit_fur = with(mainTable,abs(45-furthest_strhd_month)+abs(furthest_strtr_month))
+mainTable["room_fit_fur"]=NA
+mainTable$room_fit_fur = with(mainTable,abs(furthest_strtr_month)+abs(furthest_strhd_month))
+
+
+
+# bestfit fur ratio
+mainTable["best_ratio_fur"] = NA
+mainTable["bestfit_fur"]=NA
+for(i in 1:nrow(mainTable)){
+  sorted = sort(c(mainTable$trunk_fit_fur[i],mainTable$head_fit_fur[i],mainTable$room_fit_fur[i]))
+  ratio = format((sorted[2]/sorted[1]),digits=3) 
+  if(sorted[1]==mainTable$trunk_fit_fur[i] & is.na(sorted[1])==0){mainTable$bestfit_fur[i]="trunk"}
+  if(sorted[1]==mainTable$head_fit_fur[i] & is.na(sorted[1])==0){mainTable$bestfit_fur[i]="head"}
+  if(sorted[1]==mainTable$room_fit_fur[i] & is.na(sorted[1])==0){mainTable$bestfit_fur[i]="room"}
+  mainTable$best_ratio_fur[i] = ratio
+}
+
+
+## here - mainTable analysed_by column was edited manually in excel and reloaded - refactor this
+
+## - who did all
+mainTable["rounds"] = NA 
+monthsOnly = which(mainTable$participant %in% c("Sa4","Sa5","Sa14","Sa26"))
+for (i in monthsOnly){mainTable$rounds[i]="monthsOnly"}
+crazyOnly = which(mainTable$participant %in% c("Sa1","Sa8","Sa13"))
+for (i in crazyOnly){mainTable$rounds[i]="crazyOnly"}
+both = which(mainTable$participant %in% c("Co1","Co2","Co3","Co4","Co5","Co6","Co7","Co8","Co9","Co10","Sa6","Sa7","Sa9",
+                                          "Sa11","Sa20","Sa21","Sa22","Sa23","Sa24","Sa25"))
+for (i in both){mainTable$rounds[i]="both"}
+##
+
+
+## creating mixed fur reg fits (based on analyse_by column)
+mainTable["trunk_fit_mixed"] = NA
+mainTable["head_fit_mixed"] = NA
+mainTable["room_fit_mixed"] = NA
+for (i in 1:nrow(mainTable)){
+  if (mainTable$analyse_by[i]=="reg"){
+    mainTable$trunk_fit_mixed[i]= mainTable$trunk_fit_reg[i]
+    mainTable$head_fit_mixed[i]= mainTable$head_fit_reg[i]
+    mainTable$room_fit_mixed[i]= mainTable$room_fit_reg[i]
+  }
+ 
+  
+  if (mainTable$analyse_by[i]=="fur"){
+    mainTable$trunk_fit_mixed[i]= mainTable$trunk_fit_fur[i]
+    mainTable$head_fit_mixed[i]= mainTable$head_fit_fur[i]
+    mainTable$room_fit_mixed[i]= mainTable$room_fit_fur[i]
+  } 
+}
+
+##
+
 
 write.table(mainTable, file = "mainTable.csv", sep=";", row.names = FALSE)
+
+
+
 
 
 
@@ -507,6 +596,104 @@ browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"),
 
 
 
+mainTable["plot3d_col_month"]=NA
+
+for (i in 1:nrow(mainTable)){
+  if (mainTable$bestfit_month[i]=="trunk" & is.na(mainTable$bestfit_month[i])==0 ){mainTable$plot3d_col_month[i]="green"}
+  if (mainTable$bestfit_month[i]=="head" & is.na(mainTable$bestfit_month[i])==0){mainTable$plot3d_col_month[i]="blue"}
+  if (mainTable$bestfit_month[i]=="room" & is.na(mainTable$bestfit_month[i])==0){mainTable$plot3d_col_month[i]="red"}
+ 
+}
+
+
+
+
+
+
+with(mainTable,plot3d(trunk_fit_reg,head_fit_reg,room_fit_reg,type="s",col=plot3d_col_month,radius=2))
+#with(mainTable,text3d(trunk_fit_reg,head_fit_reg,room_fit_reg,participant,cex=0.7))
+browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
+                                      width=700,height=700), sep=""))
+
+
+
+with(mainTable,plot3d(trunk_fit_fur,head_fit_fur,room_fit_fur,type="s",col=plot3d_col_month,radius=2))
+with(mainTable,text3d(trunk_fit_fur,head_fit_fur,room_fit_fur,participant,cex=0.5))
+browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
+                                      width=700,height=700), sep=""))
+
+
+
+with(fitClu,plot3d(trunk_fit_fur,head_fit_fur,room_fit_fur,type="s",col=plot3d_col_month,radius=2))
+with(fitClu,text3d(trunk_fit_fur,head_fit_fur,room_fit_fur,participant,cex=0.5))
+browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
+                                      width=700,height=700), sep=""))
+
+
+with(fitClu,plot3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,type="s",col=plot3d_col_month,radius=2))
+with(fitClu,text3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,participant,cex=0.5))
+browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
+                                      width=700,height=700), sep=""))
+
+## clustering furthest 
+fitcluna_both = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_fur)==0)
+fitcluna = which(is.na(mainTable$trunk_fit_fur)==0)
+fitClu = mainTable[fitcluna,]
+fitClu_both = mainTable[fitcluna_both,]
+
+cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_month))
+clu2 = hclust(dist(fitClu[c("trunk_fit_fur","head_fit_fur","room_fit_fur")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+#mixed fit clustering
+fitcluna = which(is.na(mainTable$trunk_fit_fur)==0)
+fitClu = mainTable[fitcluna,]
+
+cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_month))
+clu2 = hclust(dist(fitClu[c("trunk_fit_mixed","head_fit_mixed","room_fit_mixed")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+##
+
+##kmeans
+# K-Means Cluster Analysis
+fitkm <- kmeans(fitClu[c("trunk_fit_fur","head_fit_fur","room_fit_fur")], 3) # 3 cluster solution
+# get cluster means
+aggregate(fitClu[c("trunk_fit_fur","head_fit_fur","room_fit_fur")],by=list(fitkm$cluster),FUN=mean)
+# append cluster assignment
+fitClu["kmeans"]=NA
+
+fitClu$kmeans = fitkm$cluster
+
+fitmanova = manova(cbind(fitClu$trunk_fit_fur,fitClu$head_fit_fur,fitClu$room_fit_fur)~factor(fitClu$bestfit_fur))
+summary.manova(fitmanova, test="Wilks")
+
+summary.aov(fitmanova)
+
+testaov = aov(trunk_fit_fur ~ bestfit_fur, data=fitClu)
+summary(testaov)
+TukeyHSD(testaov)
+
+##manova pairwise multivariate comparisons, below example from Ch_analysis_of_variance.pdf tutorial
+#summary(manova(cbind(mb, bh, bl, nh) ~ epoch, data = skulls, subset = epoch %in% c("c4000BC", "c3300BC")))
+
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu, subset = bestfit_fur %in% c("head","trunk") ))
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu, subset = bestfit_fur %in% c("head","room") ))
+summary(manova(cbind(trunk_fit_fur,head_fit_fur,room_fit_fur) ~ bestfit_fur, data=fitClu, subset = bestfit_fur %in% c("room","trunk") ))
+##
+
+## manova for mixed 
+fitmanova_mixed = manova(cbind(fitClu$trunk_fit_mixed,fitClu$head_fit_mixed,fitClu$room_fit_mixed)~factor(fitClu$bestfit_month))
+fitmanova_mixed_both = manova(cbind(fitClu_both$trunk_fit_mixed,fitClu_both$head_fit_mixed,fitClu_both$room_fit_mixed)~factor(fitClu_both$bestfit_month))
+fitmanova_fur_both = manova(cbind(fitClu_both$trunk_fit_fur,fitClu_both$head_fit_fur,fitClu_both$room_fit_fur)~factor(fitClu_both$bestfit_fur))
+
+save(fitmanova_mixed,fitClu,fitClu_both,fitmanova_mixed_both,fitmanova_fur_both,file="data2.Rda")
+##
+
 ##taking the largest value in fitallRF ----------------------
 fitAllRF["largest"]=NA
 for(i in 1:nrow(fitAllRF)){
@@ -525,17 +712,57 @@ pooledsds3$task = factor(pooledsds3$task) #to remove mini from factor levels
 pooledsds3$condition = factor(pooledsds3$condition)
 
 pooledsds4 = subset(pooledsds3,rounds=="both")
+write.table(pooledsds4, file = "pooledsds.csv", sep=";", row.names = FALSE)
+
+library("ggplot2", lib.loc="~/R/win-library/3.1")
+
+gg = ggplot(pooled_month,aes(x=participant,y=overall,colour=type,shape=condition))+geom_point()
+#gg = gg+facet_grid(. ~ type)
+gg = gg+stat_smooth(method=lm,aes(group=type))
+gg
+ggsave(gg,file="sds-months.png",scale=2)
+
+
+
+
+
+gg = ggplot(pooled_crazy,aes(x=participant,y=overall,colour=type,shape=condition))+geom_point()
+#gg = gg+facet_grid(. ~ type)
+gg = gg+stat_smooth(method=lm,aes(group=type))
+gg
+ggsave(gg,file="sds-crazy.png",scale=2)
+
+
+with(pooledsds4,tapply(overall,list(type,task,condition),mean))
+
+
+gg = ggplot(pooledsds4,aes(x=overall,fill=type))+geom_histogram(binwidth=1)
+gg = gg+facet_wrap(~ task)
+gg
+
+gg = ggplot(pooledsds4,aes(x=overall,colour=type))+geom_density()
+gg = gg+facet_wrap(~ task)
+gg
+ggsave(gg,file="sds-distribution.png",scale=2)
 
 sdsanova = aov(overall ~ type*task*condition +Error(participant/(task*condition)), pooledsds4)
 summary(sdsanova)
 #boxplot(overall~task*condition*type,data=pooledsds3)
 
-sdsanova2 = aov(overall ~ type, pooledsds3)
-summary(sdsanova2)
+sdsanova3 = aov(overall ~ type, pooledsds3)
+summary(sdsanova3)
+with(pooledsds4,pairwise.t.test(overall,type,p.adj="none"))
+pooled_month = subset(pooledsds4,task=="month")
+pooled_crazy = subset(pooledsds4,task=="crazy")
+with(pooled_month,t.test(overall~type))
+with(pooled_crazy,t.test(overall~type))
 
+library("lsr", lib.loc="~/R/win-library/3.1")
+with(pooled_month,cohensD(overall~type))
+with(pooled_crazy,cohensD(overall~type))
 
 
 #loading summary info and saving as Rda file for load into markdown #move this at the end of script
 participantSummary = read.csv("participants.csv",head=TRUE,sep=";")
 
-save(participantSummary,wholedata,systemOutlierCount,advOutliers,pooledSummary,sumpool,means,shiftedMeans,fitAllRF,mainTable,wholedout_mini,file="data.Rda")
+save(participantSummary,wholedata,systemOutlierCount,advOutliers,pooledSummary,sumpool,means,shiftedMeans,fitAllRF,mainTable,wholedout_mini,fitmanova,file="data.Rda")
