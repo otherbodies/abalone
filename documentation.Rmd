@@ -17,12 +17,15 @@ options(scipen=999)
 ```
 
 
-```{r,echo=FALSE}
+```{r,echo=FALSE, message=FALSE, warning=FALSE}
 #here load libraries and files for markdown code chunks
-library("knitr", lib.loc="~/R/win-library/3.1")
-library("ggplot2", lib.loc="~/R/win-library/3.1")
+library("knitr", lib.loc="~/R/win-library/3.2")
+library("ggplot2", lib.loc="~/R/win-library/3.2")
 
-setwd("~/RStudio-Projects/Abalone")
+library("bootES", lib.loc="~/R/win-library/3.2")
+
+
+setwd("C:/BERGEN/RStudio-Projects/Abalone")
 load("data.Rda")
 load("data2.Rda")
 ```
@@ -327,3 +330,78 @@ summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_mo
 summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu_both, subset = bestfit_month %in% c("head","room") ))
 summary(manova(cbind(trunk_fit_mixed,head_fit_mixed,room_fit_mixed) ~ bestfit_month, data=fitClu_both, subset = bestfit_month %in% c("room","trunk") ))
 ```
+
+
+
+***Hypotheses***
+
+
+**Testing hypothesis that preferred FoR is different for syn and for controls**
+
+CI for effect size, pearson's r. 
+This is for 10/10 (only those participants who did both month and crazy). 
+
+```{r}
+mt = subset(mainTable,rounds=="both")
+bootES(data=mt,R=20000,data.col="head_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="trunk_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="room_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+bootES(data=mt,R=20000,data.col="head_fit_month",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="trunk_fit_month",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="room_fit_month",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+bootES(data=mt,R=20000,data.col="head_fit_fur",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="trunk_fit_fur",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="room_fit_fur",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+bootES(data=mt,R=20000,data.col="head_fit_reg",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="trunk_fit_reg",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+bootES(data=mt,R=20000,data.col="room_fit_reg",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+```
+
+
+**plot of effect sizes with CI - computed with adjusted bootstrap method, pearson r ES**
+head/trunk/room + month/reg/fur/mixed
+
+where: 
+
+- *month* is distance based model fit
+- *reg* is regression line based model fit
+- *fur* is furthest month based
+- *mixed* is reg for some and fur for others
+
+
+<img src="ci-es-rf.png">
+```{r}
+
+```
+
+
+
+
+
+
+t-tests for 10/10 syn vs controls
+
+```{r}
+t.test(mt$head_fit_mixed~mt$type)
+t.test(mt$trunk_fit_mixed~mt$type)
+t.test(mt$room_fit_mixed~mt$type)
+
+t.test(mt$head_fit_month~mt$type)
+t.test(mt$trunk_fit_month~mt$type)
+t.test(mt$room_fit_month~mt$type)
+
+t.test(mt$head_fit_fur~mt$type)
+t.test(mt$trunk_fit_fur~mt$type)
+t.test(mt$room_fit_fur~mt$type)
+
+t.test(mt$head_fit_reg~mt$type)
+t.test(mt$trunk_fit_reg~mt$type)
+t.test(mt$room_fit_reg~mt$type)
+
+```
+
+

@@ -27,7 +27,7 @@ data2d$month_no = factor(data2d$month_no,labels=c("dec","jan","feb","mar","apr",
 data2d$month_no = factor(data2d$month_no,levels=c("jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"))
 save(data2d,file="dat2d.Rda")
 
-temp2d = subset(data2d,user_id=="Sa7_2DD")
+temp2d = subset(data2d,user_id=="Co1_2D")
 
 gg = ggplot(temp2d,aes(x=mouse_x,y=mouse_y,colour=month_no,shape=month_no))+coord_equal()+geom_point(size=4)+ylim(1050,0)+xlim(0,1250)
 gg = gg+ scale_shape_manual(values=c(15,16,17,18,19,8,15,16,17,18,19,8))

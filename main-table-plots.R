@@ -44,6 +44,7 @@ ggsave(gg, file="relative_room31.jpg", scale=2)
 gg = ggplot(mainTable, aes(y=trunk_fit_reg,x=head_fit_reg,colour=bestfit_month))+geom_point(size=2,na.rm=T)
 gg = gg+geom_text(aes(label=participant,size=1),hjust=0, vjust=0,na.rm=T)
 gg = gg+ylab("trunk fit from regression lines")
+gg = gg+stat_ellipse()
 gg
 
 ggsave(gg, file="head_vs_trunk_fit_reg.jpg", scale=2)

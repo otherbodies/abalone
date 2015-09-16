@@ -446,6 +446,22 @@ mainTable$head_fit_fur = with(mainTable,abs(45-furthest_strhd_month)+abs(furthes
 mainTable["room_fit_fur"]=NA
 mainTable$room_fit_fur = with(mainTable,abs(furthest_strtr_month)+abs(furthest_strhd_month))
 
+## new fit - crazy - based on regression line angles
+mainTable["trunk_fit_reg_cr"]=NA
+mainTable$trunk_fit_reg_cr = with(mainTable,abs(45-angle_str_tr_crazy)+abs(angle_str_hd_crazy))
+mainTable["head_fit_reg_cr"]=NA
+mainTable$head_fit_reg_cr = with(mainTable,abs(45-angle_str_hd_crazy)+abs(angle_str_tr_crazy))
+mainTable["room_fit_reg_cr"]=NA
+mainTable$room_fit_reg_cr = with(mainTable,abs(angle_str_tr_crazy)+abs(angle_str_hd_crazy))
+
+## new fit - crazy - based on furthest point angles
+mainTable["trunk_fit_fur_cr"]=NA
+mainTable$trunk_fit_fur_cr = with(mainTable,abs(45-furthest_strtr_horse)+abs(furthest_strhd_horse))
+mainTable["head_fit_fur_cr"]=NA
+mainTable$head_fit_fur_cr = with(mainTable,abs(45-furthest_strhd_horse)+abs(furthest_strtr_horse))
+mainTable["room_fit_fur_cr"]=NA
+mainTable$room_fit_fur_cr = with(mainTable,abs(furthest_strtr_horse)+abs(furthest_strhd_horse))
+
 
 
 # bestfit fur ratio
@@ -459,6 +475,8 @@ for(i in 1:nrow(mainTable)){
   if(sorted[1]==mainTable$room_fit_fur[i] & is.na(sorted[1])==0){mainTable$bestfit_fur[i]="room"}
   mainTable$best_ratio_fur[i] = ratio
 }
+
+
 
 
 ## here - mainTable analysed_by column was edited manually in excel and reloaded - refactor this
@@ -634,6 +652,27 @@ with(fitClu,plot3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,type="s",col=pl
 with(fitClu,text3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,participant,cex=0.5))
 browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
                                       width=700,height=700), sep=""))
+
+### here - playing with ellipsoids
+open3d()
+
+meanvec=c(mean(fitClu$trunk_fit_mixed),mean(fitClu$head_fit_mixed),mean(fitClu$room_fit_mixed))
+sigma=cov(dat)
+plot3d(ellipse3d(x=sigma,alpha=0.1,centre=meanvec))
+plot3d(ellipse3d(x=sigma,centre=c(1,1,1)),add=T)
+with(fitClu,plot3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,add=TRUE,type="s",col=plot3d_col_month,radius=2))
+
+
+
+plot3d(,add=T,type="s",radius=2)
+plot3d(dat,add=T,type="s",radius=6,alpha=0.1)
+
+# with(fitClu,text3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,participant,cex=0.5))
+
+browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
+                                      width=700,height=700), sep=""))
+
+##
 
 ## clustering furthest 
 fitcluna_both = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_fur)==0)

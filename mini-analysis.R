@@ -55,19 +55,100 @@ write.table(angSlopWide, file = "angles-slopes.csv", sep=";", row.names = FALSE)
 
 ## binding mini and means from months for inter session consistency
 
-interconsist1 = subset(wholedout_mini,condition=="str") 
-interconsist2 = subset(means,condition=="str" & task=="month" & rounds=="both")
+interconsist1 = subset(wholedout_mini,condition=="tr") 
+interconsist2 = subset(means,condition=="tr" & task=="month" & rounds=="both")
 inter_total = merge(interconsist1,interconsist2,by=c("participant","m","type","rounds","condition"))
 
 inter_total$dist = with(inter_total,sqrt((z.x-z.y)^2+(X.x-X.y)^2+(y.x-y.y)^2))
 
-inter_means = aggregate(inter_total[c("dist")],inter_total[c("type")],mean)
+inter_means = aggregate(inter_total[c("dist")],inter_total[c("participant","type")],mean)
 
+
+
+inter_lengths = aggregate(inter_total[c("dist")],inter_total[c("participant")],length)
 # bootstrap effect size with CI  - with bootES package
 library("bootES", lib.loc="~/R/win-library/3.1")
 
 test = inter_total[,c("type","dist")]
 
 
-bootES(data=test,R=20000,data.col="dist",group.col="type",contrast=c("control","synaesthete"),effect.type="r",plot=T)
+boo = bootES(data=test,R=2000,data.col="dist",group.col="type",contrast=c("control","synaesthete"),effect.type="r",plot=F)
 
+bootES(data=inter_means,R=20000,data.col="dist",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
+
+
+
+write.table(inter_total, file = "inter.csv", sep=";", row.names = FALSE)
+write.table(inter_means, file = "inter_str_means.csv", sep=";", row.names = FALSE)
+
+
+
+
+## group comparisons 10/10 
+mt = subset(mainTable,rounds=="both")
+b1 = bootES(data=mt,R=20000,data.col="head_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b2 = bootES(data=mt,R=20000,data.col="trunk_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b3 = bootES(data=mt,R=20000,data.col="room_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+b4 = bootES(data=mt,R=20000,data.col="head_fit_month",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b5 = bootES(data=mt,R=20000,data.col="trunk_fit_month",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b6 = bootES(data=mt,R=20000,data.col="room_fit_month",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+b7 = bootES(data=mt,R=20000,data.col="head_fit_fur",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b8 = bootES(data=mt,R=20000,data.col="trunk_fit_fur",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b9 = bootES(data=mt,R=20000,data.col="room_fit_fur",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+b10 = bootES(data=mt,R=20000,data.col="head_fit_reg",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b11 = bootES(data=mt,R=20000,data.col="trunk_fit_reg",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b12 = bootES(data=mt,R=20000,data.col="room_fit_reg",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+b_list=list(b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12)
+
+es_table = data.frame(es=numeric(12),ci_low=numeric(12),ci_high=numeric(12))
+measure = c("head_fit_mixed","trunk_fit_mixed","room_fit_mixed","head_fit_month","trunk_fit_month","room_fit_month","head_fit_fur","trunk_fit_fur","room_fit_fur",
+         "head_fit_reg","trunk_fit_reg","room_fit_reg")
+es_table$measure = measure
+
+for (i in 1:12){
+  es = b_list[[i]]$t0
+  ci_low = b_list[[i]]$bounds[1]
+  ci_high = b_list[[i]]$bounds[2]
+  es_table[i,]$es = es
+  es_table[i,]$ci_low = ci_low
+  es_table[i,]$ci_high = ci_high
+}
+
+##plotting es with ci 
+gg = ggplot(es_table,aes(y=measure,x=es))+geom_point()
+gg = gg+geom_errorbarh(aes(xmin=ci_low, xmax=ci_high),height=0.5)
+gg
+
+#t-tests for group comparisons 10/10
+t.test(mt$head_fit_mixed~mt$type)
+t.test(mt$trunk_fit_mixed~mt$type)
+t.test(mt$room_fit_mixed~mt$type)
+
+t.test(mt$head_fit_month~mt$type)
+t.test(mt$trunk_fit_month~mt$type)
+t.test(mt$room_fit_month~mt$type)
+
+t.test(mt$head_fit_fur~mt$type)
+t.test(mt$trunk_fit_fur~mt$type)
+t.test(mt$room_fit_fur~mt$type)
+
+t.test(mt$head_fit_reg~mt$type)
+t.test(mt$trunk_fit_reg~mt$type)
+t.test(mt$room_fit_reg~mt$type)
+
+
+##consistency CI ES
+conTableM$type = NA
+conTableM[1:10,]$type = "control"
+conTableM[11:20,]$type = "synaesthete"
+
+bootES(data=conTableM,R=20000,data.col="overall_hd_m",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
+bootES(data=conTableM,R=20000,data.col="overall_hd_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
+bootES(data=conTableM,R=20000,data.col="overall_str_m",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
+bootES(data=conTableM,R=20000,data.col="overall_str_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
+bootES(data=conTableM,R=20000,data.col="overall_tr_m",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
+bootES(data=conTableM,R=20000,data.col="overall_tr_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
