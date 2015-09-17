@@ -67,7 +67,7 @@ inter_means = aggregate(inter_total[c("dist")],inter_total[c("participant","type
 
 inter_lengths = aggregate(inter_total[c("dist")],inter_total[c("participant")],length)
 # bootstrap effect size with CI  - with bootES package
-library("bootES", lib.loc="~/R/win-library/3.1")
+library("bootES", lib.loc="~/R/win-library/3.2")
 
 test = inter_total[,c("type","dist")]
 
@@ -83,8 +83,10 @@ write.table(inter_means, file = "inter_str_means.csv", sep=";", row.names = FALS
 
 
 
-
+## MONTHS ANALYSIS - PART OF MAIN ANALYSIS
+## Testing hypothesis that preferred FoR is different for syn and for controls
 ## group comparisons 10/10 
+
 mt = subset(mainTable,rounds=="both")
 b1 = bootES(data=mt,R=20000,data.col="head_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
 b2 = bootES(data=mt,R=20000,data.col="trunk_fit_mixed",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
@@ -152,3 +154,57 @@ bootES(data=conTableM,R=20000,data.col="overall_str_m",group.col="type",contrast
 bootES(data=conTableM,R=20000,data.col="overall_str_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
 bootES(data=conTableM,R=20000,data.col="overall_tr_m",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
 bootES(data=conTableM,R=20000,data.col="overall_tr_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="cohens.d",plot=F)
+
+
+## CRAZY ANALYSIS - PART OF MAIN ANALYSIS
+## Testing hypothesis that preferred FoR is different for syn and for controls
+## group comparisons 10/10 
+
+mt = subset(mainTable,rounds=="both")
+
+b1_cr = bootES(data=mt,R=20000,data.col="head_fit_horse",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b2_cr = bootES(data=mt,R=20000,data.col="trunk_fit_horse",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b3_cr = bootES(data=mt,R=20000,data.col="room_fit_horse",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+b4_cr = bootES(data=mt,R=20000,data.col="head_fit_fur_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b5_cr = bootES(data=mt,R=20000,data.col="trunk_fit_fur_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b6_cr = bootES(data=mt,R=20000,data.col="room_fit_fur_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+b7_cr = bootES(data=mt,R=20000,data.col="head_fit_reg_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b8_cr = bootES(data=mt,R=20000,data.col="trunk_fit_reg_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+b9_cr = bootES(data=mt,R=20000,data.col="room_fit_reg_cr",group.col="type",contrast=c("synaesthete","control"),effect.type="r",plot=F)
+
+b_list_cr=list(b1_cr,b2_cr,b3_cr,b4_cr,b5_cr,b6_cr,b7_cr,b8_cr,b9_cr)
+
+es_table_cr = data.frame(es=numeric(9),ci_low=numeric(9),ci_high=numeric(9))
+measure_cr = c("head_fit_horse","trunk_fit_horse","room_fit_horse","head_fit_fur_cr","trunk_fit_fur_cr","room_fit_fur_cr",
+            "head_fit_reg_cr","trunk_fit_reg_cr","room_fit_reg_cr")
+es_table_cr$measure = measure_cr
+
+for (i in 1:9){
+  es = b_list_cr[[i]]$t0
+  ci_low = b_list_cr[[i]]$bounds[1]
+  ci_high = b_list_cr[[i]]$bounds[2]
+  es_table_cr[i,]$es = es
+  es_table_cr[i,]$ci_low = ci_low
+  es_table_cr[i,]$ci_high = ci_high
+}
+
+##plotting es with ci 
+gg = ggplot(es_table_cr,aes(y=measure,x=es))+geom_point()
+gg = gg+geom_errorbarh(aes(xmin=ci_low, xmax=ci_high),height=0.5)
+gg
+
+#t-tests for group comparisons 10/10
+
+t.test(mt$head_fit_horse~mt$type)
+t.test(mt$trunk_fit_horse~mt$type)
+t.test(mt$room_fit_horse~mt$type)
+
+t.test(mt$head_fit_fur_cr~mt$type)
+t.test(mt$trunk_fit_fur_cr~mt$type)
+t.test(mt$room_fit_fur_cr~mt$type)
+
+t.test(mt$head_fit_reg_cr~mt$type)
+t.test(mt$trunk_fit_reg_cr~mt$type)
+t.test(mt$room_fit_reg_cr~mt$type)

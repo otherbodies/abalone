@@ -1850,7 +1850,11 @@ img {
 ## Residuals      9                                              
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<p><strong><em>Hypotheses</em></strong></p>
+<div id="hypotheses" class="section level3">
+<h3>Hypotheses</h3>
+</div>
+<div id="months" class="section level2">
+<h2>MONTHS</h2>
 <p><strong>Testing hypothesis that preferred FoR is different for syn and for controls</strong></p>
 <p>CI for effect size, pearson’s r. This is for 10/10 (only those participants who did both month and crazy).</p>
 <pre class="r"><code>mt = subset(mainTable,rounds==&quot;both&quot;)
@@ -1860,84 +1864,84 @@ bootES(data=mt,R=20000,data.col=&quot;head_fit_mixed&quot;,group.col=&quot;type&
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## -0.264      -0.613      0.224       -0.001      0.210</code></pre>
+## -0.264      -0.620      0.213       0.000       0.212</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;trunk_fit_mixed&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## 0.162       -0.315      0.580       0.005       0.228</code></pre>
+## 0.162       -0.317      0.581       0.005       0.229</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;room_fit_mixed&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## -0.403      -0.676      0.127       -0.012      0.190</code></pre>
+## -0.403      -0.684      0.121       -0.008      0.192</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;head_fit_month&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## -0.055      -0.479      0.423       0.009       0.229</code></pre>
+## -0.055      -0.483      0.415       0.012       0.230</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;trunk_fit_month&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## 0.382       -0.121      0.692       0.009       0.199</code></pre>
+## 0.382       -0.119      0.700       0.008       0.201</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;room_fit_month&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## 0.029       -0.420      0.466       0.002       0.229</code></pre>
+## 0.029       -0.426      0.467       -0.003      0.231</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;head_fit_fur&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## -0.258      -0.612      0.234       0.001       0.210</code></pre>
+## -0.258      -0.615      0.225       0.002       0.212</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;trunk_fit_fur&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## 0.160       -0.320      0.562       -0.000      0.225</code></pre>
+## 0.160       -0.312      0.569       -0.000      0.224</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;room_fit_fur&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## -0.396      -0.664      0.114       -0.009      0.186</code></pre>
+## -0.396      -0.665      0.130       -0.008      0.188</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;head_fit_reg&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## -0.145      -0.540      0.332       0.004       0.223</code></pre>
+## -0.145      -0.536      0.332       0.003       0.224</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;trunk_fit_reg&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## 0.019       -0.432      0.458       0.002       0.229</code></pre>
+## 0.019       -0.438      0.465       0.005       0.232</code></pre>
 <pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;room_fit_reg&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
 <pre><code>## 
 ## User-specified lambdas: (synaesthete, control)
 ## Scaled lambdas: (-1, 1)
 ## 95.00% bca Confidence Interval, 20000 replicates
 ## Stat        CI (Low)    CI (High)   bias        SE          
-## -0.263      -0.636      0.231       -0.005      0.219</code></pre>
+## -0.263      -0.637      0.226       -0.005      0.218</code></pre>
 <p><strong>plot of effect sizes with CI - computed with adjusted bootstrap method, pearson r ES</strong> head/trunk/room + month/reg/fur/mixed</p>
 <p>where:</p>
 <ul>
@@ -1947,7 +1951,7 @@ bootES(data=mt,R=20000,data.col=&quot;head_fit_mixed&quot;,group.col=&quot;type&
 <li><em>mixed</em> is reg for some and fur for others</li>
 </ul>
 <p><img src="data:image/png;base64,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"></p>
-<p>t-tests for 10/10 syn vs controls</p>
+<p>t-tests for 10/10 syn vs controls MONTHS</p>
 <pre class="r"><code>t.test(mt$head_fit_mixed~mt$type)</code></pre>
 <pre><code>## 
 ##  Welch Two Sample t-test
@@ -2092,6 +2096,193 @@ bootES(data=mt,R=20000,data.col=&quot;head_fit_mixed&quot;,group.col=&quot;type&
 ## sample estimates:
 ##     mean in group control mean in group synaesthete 
 ##                  35.23246                  46.72560</code></pre>
+</div>
+<div id="crazy" class="section level2">
+<h2>CRAZY</h2>
+<p><strong>Testing hypothesis that preferred FoR is different for syn and for controls</strong></p>
+<p>CI for effect size, pearson’s r. This is for 10/10 (only those participants who did both month and crazy).</p>
+<pre class="r"><code>mt = subset(mainTable,rounds==&quot;both&quot;)
+bootES(data=mt,R=20000,data.col=&quot;head_fit_horse&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## 0.176       -0.330      0.613       0.027       0.243</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;trunk_fit_horse&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## 0.265       -0.264      0.620       0.013       0.219</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;room_fit_horse&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## 0.040       -0.421      0.470       0.003       0.230</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;head_fit_fur_cr&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## -0.085      -0.493      0.407       0.021       0.231</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;trunk_fit_fur_cr&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## -0.055      -0.472      0.413       0.002       0.228</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;room_fit_fur_cr&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## -0.163      -0.588      0.316       -0.018      0.235</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;head_fit_reg_cr&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## 0.035       -0.420      0.488       0.012       0.234</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;trunk_fit_reg_cr&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## 0.082       -0.378      0.504       0.003       0.227</code></pre>
+<pre class="r"><code>bootES(data=mt,R=20000,data.col=&quot;room_fit_reg_cr&quot;,group.col=&quot;type&quot;,contrast=c(&quot;synaesthete&quot;,&quot;control&quot;),effect.type=&quot;r&quot;,plot=F)</code></pre>
+<pre><code>## 
+## User-specified lambdas: (synaesthete, control)
+## Scaled lambdas: (-1, 1)
+## 95.00% bca Confidence Interval, 20000 replicates
+## Stat        CI (Low)    CI (High)   bias        SE          
+## -0.275      -0.628      0.220       -0.004      0.212</code></pre>
+<p><strong>plot of effect sizes with CI - computed with adjusted bootstrap method, pearson r ES</strong> head/trunk/room + horse/reg/fur</p>
+<p>where:</p>
+<ul>
+<li><em>horse</em> is distance based model fit</li>
+<li><em>reg</em> is regression line based model fit</li>
+<li><em>fur</em> is furthest month based</li>
+</ul>
+<p><img src="data:image/png;base64,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"></p>
+<p>t-tests for 10/10 syn vs controls CRAZY</p>
+<pre class="r"><code>t.test(mt$head_fit_horse~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$head_fit_horse by mt$type
+## t = 0.759, df = 16.045, p-value = 0.4589
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -49.90559 105.59159
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                   197.291                   169.448</code></pre>
+<pre class="r"><code>t.test(mt$trunk_fit_horse~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$trunk_fit_horse by mt$type
+## t = 1.166, df = 17.996, p-value = 0.2589
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -49.54478 173.11078
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                   276.663                   214.880</code></pre>
+<pre class="r"><code>t.test(mt$room_fit_horse~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$room_fit_horse by mt$type
+## t = 0.17087, df = 17.541, p-value = 0.8663
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -68.38754  80.47154
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                   160.816                   154.774</code></pre>
+<pre class="r"><code>t.test(mt$head_fit_fur_cr~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$head_fit_fur_cr by mt$type
+## t = -0.36005, df = 14.035, p-value = 0.7242
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -37.02693  26.38013
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                   52.2760                   57.5994</code></pre>
+<pre class="r"><code>t.test(mt$trunk_fit_fur_cr~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$trunk_fit_fur_cr by mt$type
+## t = -0.23281, df = 17.811, p-value = 0.8186
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -36.00089  28.82289
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                    57.080                    60.669</code></pre>
+<pre class="r"><code>t.test(mt$room_fit_fur_cr~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$room_fit_fur_cr by mt$type
+## t = -0.70026, df = 17.719, p-value = 0.4929
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -32.68169  16.35569
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                    42.740                    50.903</code></pre>
+<pre class="r"><code>t.test(mt$head_fit_reg_cr~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$head_fit_reg_cr by mt$type
+## t = 0.14653, df = 16.143, p-value = 0.8853
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -29.32755  33.68615
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                   56.6680                   54.4887</code></pre>
+<pre class="r"><code>t.test(mt$trunk_fit_reg_cr~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$trunk_fit_reg_cr by mt$type
+## t = 0.34992, df = 17.975, p-value = 0.7305
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -18.95479  26.52979
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                   51.2340                   47.4465</code></pre>
+<pre class="r"><code>t.test(mt$room_fit_reg_cr~mt$type)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  mt$room_fit_reg_cr by mt$type
+## t = -1.2144, df = 17.583, p-value = 0.2407
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -29.921857   8.024857
+## sample estimates:
+##     mean in group control mean in group synaesthete 
+##                   35.9460                   46.8945</code></pre>
+</div>
 </div>
 
 

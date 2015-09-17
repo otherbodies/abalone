@@ -1,6 +1,6 @@
 ## main table scatterplots etc
 
-library("ggplot2", lib.loc="~/R/win-library/3.1")
+library("ggplot2", lib.loc="~/R/win-library/3.2")
 
 gg = ggplot(mainTable, aes(y=as.numeric(ratio_month),x=type,colour=bestfit_month))+scale_y_continuous(limits=c(1,4))+geom_point(size=2,na.rm=T)
 gg = gg+geom_text(aes(label=participant,size=1),hjust=0, vjust=0,na.rm=T)

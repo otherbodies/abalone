@@ -1,3 +1,8 @@
+
+# data loading and raw data processing ------------------------------------
+
+
+
 patchToData = "C:/OTHERBODIES/bergen-research-data/data-analysis-may-2014/allfiles3/"
 
 # function that takes pre-prepared files listed in metatable.csv, updates conditions, and binds them into one file 
@@ -233,6 +238,9 @@ write.table(wholedout3, file = "wholedout-unity.csv", sep=",", row.names = FALSE
 
 
 
+# pooled sd's -------------------------------------------------------------
+
+
 ############ pooled sd's
  tobepooled = sds
  tobepooled$length = lengths$X
@@ -347,7 +355,7 @@ mstr = subset(means,condition=="str" & task!="mini")
   write.table(fitAllRF, file = "C://allfiles2//fitAllRF.txt", sep=",", row.names = FALSE)
   
 
-#### making main table ------------------
+#### making main table preliminary ------------------
   fitForTrunkSimple = avDifSwingTrunk$Dist
   fitForHeadSimple = avDifSwingHead$Dist
 
@@ -382,6 +390,12 @@ altangleSlopeTemp$angleHd = as.numeric(altangleSlopeTemp$angleHd)
 altangleSlopeTemp["furthest_str_hd"] = altangleSlopeTemp$angleStr - altangleSlopeTemp$angleHd
 altangleSlopeTemp["furthest_str_tr"] = altangleSlopeTemp$angleStr - altangleSlopeTemp$angleTr
 altangleSlopeTemp["furthest_diffOfDiffs"] = altangleSlopeTemp$furthest_str_hd - altangleSlopeTemp$furthest_str_tr
+
+
+# mainTable making --------------------------------------------------------
+
+
+
 
 ## making the wide format
 
@@ -476,7 +490,29 @@ for(i in 1:nrow(mainTable)){
   mainTable$best_ratio_fur[i] = ratio
 }
 
+# bestfit fur ratio - crazy
+mainTable["best_ratio_fur_cr"] = NA
+mainTable["bestfit_fur_cr"]=NA
+for(i in 1:nrow(mainTable)){
+  sorted = sort(c(mainTable$trunk_fit_fur_cr[i],mainTable$head_fit_fur_cr[i],mainTable$room_fit_fur_cr[i]))
+  ratio = format((sorted[2]/sorted[1]),digits=3) 
+  if(sorted[1]==mainTable$trunk_fit_fur_cr[i] & is.na(sorted[1])==0){mainTable$bestfit_fur_cr[i]="trunk"}
+  if(sorted[1]==mainTable$head_fit_fur_cr[i] & is.na(sorted[1])==0){mainTable$bestfit_fur_cr[i]="head"}
+  if(sorted[1]==mainTable$room_fit_fur_cr[i] & is.na(sorted[1])==0){mainTable$bestfit_fur_cr[i]="room"}
+  mainTable$best_ratio_fur_cr[i] = ratio
+}
 
+# bestfit reg ratio - crazy
+mainTable["best_ratio_reg_cr"] = NA
+mainTable["bestfit_reg_cr"]=NA
+for(i in 1:nrow(mainTable)){
+  sorted = sort(c(mainTable$trunk_fit_reg_cr[i],mainTable$head_fit_reg_cr[i],mainTable$room_fit_reg_cr[i]))
+  ratio = format((sorted[2]/sorted[1]),digits=3) 
+  if(sorted[1]==mainTable$trunk_fit_reg_cr[i] & is.na(sorted[1])==0){mainTable$bestfit_reg_cr[i]="trunk"}
+  if(sorted[1]==mainTable$head_fit_reg_cr[i] & is.na(sorted[1])==0){mainTable$bestfit_reg_cr[i]="head"}
+  if(sorted[1]==mainTable$room_fit_reg_cr[i] & is.na(sorted[1])==0){mainTable$bestfit_reg_cr[i]="room"}
+  mainTable$best_ratio_reg_cr[i] = ratio
+}
 
 
 ## here - mainTable analysed_by column was edited manually in excel and reloaded - refactor this
@@ -520,21 +556,15 @@ write.table(mainTable, file = "mainTable.csv", sep=";", row.names = FALSE)
 
 
 
+# older plotting based on fitAllRF ----------------------------------------
 
 
-
-
-############
-
-
-
-
+########## some older plotting based on fitAllRF, mainTable-based is below thich chunk
 
   #ggplot plotting
   gg = ggplot(fitAllRF,aes(x=fitHead,y=fitTrunk,colour=type))+coord_equal()+geom_point(size=3)
   gg = gg +scale_x_continuous(limits=c(50, 300)) #adjust this to show all data points nicely
   gg +geom_text(aes(label=participant),hjust=0, vjust=0)
-
 
 
   ## preparing and plotting comparison to model shift - in process...
@@ -579,7 +609,6 @@ par(mar=c(5,4,4,4))
 plot(fitAllRFX$fitHeadX,fitAllRFX$fitTrunkX,xlab="Fit to Head X: low values = better fit",ylab="Fit to Trunk X")
 text(fitAllRFX$fitHeadX,fitAllRFX$fitTrunkX,labels=fitAllRFX$participant)
 
-
 fitClu = na.omit(fitAllRF)
 cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$task))
 clu2 = hclust(dist(fitClu[c("fitHead","fitTrunk","fitRoom")]),method="ward.D")
@@ -590,21 +619,16 @@ rect.hclust(clu2, k=3, border="red")
 fitClu3d = fitClu[c("fitHead","fitTrunk","fitRoom")]
 scatterplot3d(fitClu3d,color=groups)
 
-
 ## anovas on model fit
 fitAllRF["group"]=NA
 fitAllRF$group[1:20]="control"
 fitAllRF$group[21:47]="synaesth"
-
-
 
 #plotting 3d - adding column with colours
 fitAllRF["typecolour"]="green"
 #fitAllRF$typecolour[1:9]="red"
 #fitAllRF$typecolour[10:19]="green"
 
-##plotting 3d ant to the web  ------------------------------
-library("rgl", lib.loc="C:/Users/andrzej/Documents/R/win-library/3.0")
 plot3d(fitAllRF$fitHead,fitAllRF$fitTrunk,fitAllRF$fitRoom)
 
 with(fitAllRF,plot3d(fitHead,fitTrunk,fitRoom,type="s",col=typecolour,radius=5))
@@ -614,6 +638,13 @@ browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"),
 
 
 
+##plotting 3d and to the web  ------------------------------
+## plotting 3d, from mainTable, not from older fitAllRF
+
+library("rgl", lib.loc="C:/Users/andrzej/Documents/R/win-library/3.2")
+
+
+# making column for 3d plot colors
 mainTable["plot3d_col_month"]=NA
 
 for (i in 1:nrow(mainTable)){
@@ -624,15 +655,10 @@ for (i in 1:nrow(mainTable)){
 }
 
 
-
-
-
-
 with(mainTable,plot3d(trunk_fit_reg,head_fit_reg,room_fit_reg,type="s",col=plot3d_col_month,radius=2))
 #with(mainTable,text3d(trunk_fit_reg,head_fit_reg,room_fit_reg,participant,cex=0.7))
 browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
                                       width=700,height=700), sep=""))
-
 
 
 with(mainTable,plot3d(trunk_fit_fur,head_fit_fur,room_fit_fur,type="s",col=plot3d_col_month,radius=2))
@@ -641,17 +667,21 @@ browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"),
                                       width=700,height=700), sep=""))
 
 
-
 with(fitClu,plot3d(trunk_fit_fur,head_fit_fur,room_fit_fur,type="s",col=plot3d_col_month,radius=2))
 with(fitClu,text3d(trunk_fit_fur,head_fit_fur,room_fit_fur,participant,cex=0.5))
 browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
                                       width=700,height=700), sep=""))
 
-
 with(fitClu,plot3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,type="s",col=plot3d_col_month,radius=2))
 with(fitClu,text3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,participant,cex=0.5))
 browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
                                       width=700,height=700), sep=""))
+
+
+
+# 
+
+
 
 ### here - playing with ellipsoids
 open3d()
