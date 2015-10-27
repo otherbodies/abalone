@@ -96,3 +96,19 @@ km.boot.real <- clusterboot(fitClu[c("trunk_fit_fur","head_fit_fur","room_fit_fu
                             clustermethod=kmeansCBI,
                             krange=3)
 km.boot.real
+
+
+## playing with binomial distribution - what is the probability of throwing 1 on a 3 sided dice, 12 or more times out of 20 throws
+
+
+prob= dbinom(12,size=20,prob=0.33)+
+  dbinom(13,size=20,prob=0.33)+
+  dbinom(14,size=20,prob=0.33)+
+  dbinom(15,size=20,prob=0.33)+
+  dbinom(16,size=20,prob=0.33)+
+  dbinom(17,size=20,prob=0.33)+
+  dbinom(18,size=20,prob=0.33)+
+  dbinom(19,size=20,prob=0.33)+
+  dbinom(20,size=20,prob=0.33)
+
+prob

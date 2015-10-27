@@ -515,6 +515,32 @@ for(i in 1:nrow(mainTable)){
 }
 
 
+# bestfit reg ratio - months
+mainTable["best_ratio_reg"] = NA
+mainTable["bestfit_reg"]=NA
+for(i in 1:nrow(mainTable)){
+  sorted = sort(c(mainTable$trunk_fit_reg[i],mainTable$head_fit_reg[i],mainTable$room_fit_reg[i]))
+  ratio = format((sorted[2]/sorted[1]),digits=3) 
+  if(sorted[1]==mainTable$trunk_fit_reg[i] & is.na(sorted[1])==0){mainTable$bestfit_reg[i]="trunk"}
+  if(sorted[1]==mainTable$head_fit_reg[i] & is.na(sorted[1])==0){mainTable$bestfit_reg[i]="head"}
+  if(sorted[1]==mainTable$room_fit_reg[i] & is.na(sorted[1])==0){mainTable$bestfit_reg[i]="room"}
+  mainTable$best_ratio_reg[i] = ratio
+}
+
+
+# bestfit mixed ratio - months
+mainTable["best_ratio_mixed"] = NA
+mainTable["bestfit_mixed"]=NA
+for(i in 1:nrow(mainTable)){
+  sorted = sort(c(mainTable$trunk_fit_mixed[i],mainTable$head_fit_mixed[i],mainTable$room_fit_mixed[i]))
+  ratio = format((sorted[2]/sorted[1]),digits=3) 
+  if(sorted[1]==mainTable$trunk_fit_mixed[i] & is.na(sorted[1])==0){mainTable$bestfit_mixed[i]="trunk"}
+  if(sorted[1]==mainTable$head_fit_mixed[i] & is.na(sorted[1])==0){mainTable$bestfit_mixed[i]="head"}
+  if(sorted[1]==mainTable$room_fit_mixed[i] & is.na(sorted[1])==0){mainTable$bestfit_mixed[i]="room"}
+  mainTable$best_ratio_mixed[i] = ratio
+}
+
+
 ## here - mainTable analysed_by column was edited manually in excel and reloaded - refactor this
 
 ## - who did all
@@ -551,7 +577,7 @@ for (i in 1:nrow(mainTable)){
 ##
 
 
-write.table(mainTable, file = "mainTable.csv", sep=";", row.names = FALSE)
+write.table(mainTable, file = "mainTable.csv", sep=",", row.names = FALSE)
 
 
 
@@ -641,7 +667,8 @@ browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"),
 ##plotting 3d and to the web  ------------------------------
 ## plotting 3d, from mainTable, not from older fitAllRF
 
-library("rgl", lib.loc="C:/Users/andrzej/Documents/R/win-library/3.2")
+
+library("rgl", lib.loc="~/R/win-library/3.2")
 
 
 # making column for 3d plot colors
@@ -661,8 +688,8 @@ browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"),
                                       width=700,height=700), sep=""))
 
 
-with(mainTable,plot3d(trunk_fit_fur,head_fit_fur,room_fit_fur,type="s",col=plot3d_col_month,radius=2))
-with(mainTable,text3d(trunk_fit_fur,head_fit_fur,room_fit_fur,participant,cex=0.5))
+with(mainTable,plot3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,type="s",col=rgb(0,0.5,0),radius=2))
+with(mainTable,text3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,bestfit_mixed,cex=0.5))
 browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
                                       width=700,height=700), sep=""))
 
@@ -672,20 +699,152 @@ with(fitClu,text3d(trunk_fit_fur,head_fit_fur,room_fit_fur,participant,cex=0.5))
 browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
                                       width=700,height=700), sep=""))
 
+
 with(fitClu,plot3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,type="s",col=plot3d_col_month,radius=2))
-with(fitClu,text3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,participant,cex=0.5))
+with(fitClu,text3d(trunk_fit_mixed,head_fit_mixed,room_fit_mixed,bestfit_mixed,cex=0.5))
 browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
                                       width=700,height=700), sep=""))
 
 
 
-# 
+# 3d plotting - crazy
+# making column for 3d plot colors - crazy
+mainTable["plot3d_col_cr"]=NA
+
+for (i in 1:nrow(mainTable)){
+  if (mainTable$bestfit_horse[i]=="trunk" & mainTable$type[i]=="control" & is.na(mainTable$bestfit_horse[i])==0 ){mainTable$plot3d_col_cr[i]=rgb(0,1,0)}
+  if (mainTable$bestfit_horse[i]=="head" & mainTable$type[i]=="control"  & is.na(mainTable$bestfit_horse[i])==0){mainTable$plot3d_col_cr[i]=rgb(1,0,0)}
+  if (mainTable$bestfit_horse[i]=="room" & mainTable$type[i]=="control"  & is.na(mainTable$bestfit_horse[i])==0){mainTable$plot3d_col_cr[i]=rgb(0,0,1)}
+  if (mainTable$bestfit_horse[i]=="trunk" & mainTable$type[i]=="synaesthete" & is.na(mainTable$bestfit_horse[i])==0 ){mainTable$plot3d_col_cr[i]=rgb(0,0.5,0)}
+  if (mainTable$bestfit_horse[i]=="head" & mainTable$type[i]=="synaesthete"  & is.na(mainTable$bestfit_horse[i])==0){mainTable$plot3d_col_cr[i]=rgb(0.5,0,0)}
+  if (mainTable$bestfit_horse[i]=="room" & mainTable$type[i]=="synaesthete"  & is.na(mainTable$bestfit_horse[i])==0){mainTable$plot3d_col_cr[i]=rgb(0,0,0.5)}
+  
+}
+
+mainTable_syn = subset(mainTable,type=="synaesthete")
+mainTable_con = subset(mainTable,type=="control")
+
+with(mainTable_syn,plot3d(trunk_fit_reg_cr,head_fit_reg_cr,room_fit_reg_cr,type="s",col=plot3d_col_cr,radius=2))
+with(mainTable_con,plot3d(trunk_fit_reg,head_fit_reg,room_fit_reg,radius=3,col=plot3d_col_cr,radius=2))
+browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"), 
+                                      width=700,height=700), sep=""))
+
+## new 3d plotting (tutorial below)
+# http://www.sthda.com/english/wiki/a-complete-guide-to-3d-visualization-device-system-in-r-r-software-and-data-visualization
+# http://planspace.org/2013/02/03/pca-3d-visualization-and-clustering-in-r/
+
+
+mainTable_didall = subset(mainTable,rounds=="both")
+mainTable_didall_syn = subset(mainTable,rounds=="both" & type=="synaesthete")
+mainTable_didall_con = subset(mainTable,rounds=="both" & type=="control")
+
+x = mainTable_didall$trunk_fit_reg_cr
+y = mainTable_didall$head_fit_reg_cr
+z = mainTable_didall$room_fit_reg_cr
+x1 =mainTable_didall$trunk_fit_mixed
+y1 =mainTable_didall$head_fit_mixed
+z1 =mainTable_didall$room_fit_mixed
 
 
 
-### here - playing with ellipsoids
+
+# creating factors to later convert to colors
+mainTable_didall$bestfit_reg_cr = factor(mainTable_didall$bestfit_reg_cr)
+mainTable_didall$bestfit_mixed = factor(mainTable_didall$bestfit_mixed)
+mainTable_didall_syn$bestfit_reg_cr = factor(mainTable_didall_syn$bestfit_reg_cr)
+mainTable_didall_syn$bestfit_mixed = factor(mainTable_didall_syn$bestfit_mixed)
+mainTable_didall_con$bestfit_reg_cr = factor(mainTable_didall_con$bestfit_reg_cr)
+mainTable_didall_con$bestfit_mixed = factor(mainTable_didall_con$bestfit_mixed)
+
+# 3d plot of both months and crazy with lines connecting them
+rgl.open()
+rgl.bg(color="white")
+rgl.spheres(x,y,z,r=1,color="yellow")
+shapelist3d(cube3d(),x1,y1,z1,size=1,color="red")
+text3d(x,y,z,text=mainTable_didall$participant,cex=0.5,color="black")
+#rgl.lines(c(x[1],x1[1]),c(y[1],y1[1]),c(z[1],z1[1]),color="blue")
+#rgl.lines(c(x[2],x1[2]),c(y[2],y1[2]),c(z[2],z1[2]),color="blue")
+for(i in 1:20){
+  rgl.lines(c(x[i],x1[i]),c(y[i],y1[i]),c(z[i],z1[i]),color="blue")
+}
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="months & knight",xlab="trunk",ylab="head",zlab="room")
+browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl", "webGL"), 
+                                      width=700,height=700), sep=""))
+#rgl.bbox(color=c("white","black"),draw_front = T) # Add bounding box decoration
+
+#3d plot of horse
+rgl.open()
+rgl.bg(color="white")
+#rgl.spheres(x,y,z,r=1,color="yellow")
+text3d(x,y,z,text=mainTable_didall$participant,cex=0.5,color=as.integer(mainTable_didall$bestfit_reg_cr)+1)
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="horse - angles / colors - bestfit (blue trunk, red head, green - room)",xlab="trunk",ylab="head",zlab="room")
+#legend3d("topright",legend=c("Trunk","Head","Room"), col = rainbow(3))
+browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl_horse", "webGL"), 
+                                      width=800,height=800), sep=""))
+
+
+#3d plot of months
+rgl.open()
+rgl.bg(color="white")
+#rgl.spheres(x1,y1,z1,r=1,color="yellow")
+text3d(x1,y1,z1,text=mainTable_didall$participant,cex=0.5,color=as.integer(mainTable_didall$bestfit_mixed)+1)
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="months - angles / colors - bestfit (blue trunk, red head, green - room)",xlab="trunk",ylab="head",zlab="room")
+#legend3d("topright",legend=c("Trunk","Head","Room"), col = rainbow(3))
+browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl_months", "webGL"), 
+                                      width=800,height=800), sep=""))
+
+
+## the same plots as above, but with colors for bestfit from reverse task
+
+#3d plot of horse
+rgl.open()
+rgl.bg(color="white")
+#rgl.spheres(x,y,z,r=1,color="yellow")
+text3d(x,y,z,text=mainTable_didall$participant,cex=0.5,color=as.integer(mainTable_didall$bestfit_mixed)+1)
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="horse - angles / colors - bestfit MONTHS (blue trunk, red head, green - room)",xlab="trunk",ylab="head",zlab="room")
+#legend3d("topright",legend=c("Trunk","Head","Room"), col = rainbow(3))
+browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl_horse_rv", "webGL"), 
+                                      width=800,height=800), sep=""))
+
+
+#3d plot of months
+rgl.open()
+rgl.bg(color="white")
+#rgl.spheres(x1,y1,z1,r=1,color="yellow")
+text3d(x1,y1,z1,text=mainTable_didall$participant,cex=0.5,color=as.integer(mainTable_didall$bestfit_reg_cr)+1)
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="months - angles / colors - bestfit HORSE (blue trunk, red head, green - room)",xlab="trunk",ylab="head",zlab="room")
+#legend3d("topright",legend=c("Trunk","Head","Room"), col = rainbow(3))
+browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl_months_rv", "webGL"), 
+                                      width=800,height=800), sep=""))
+
+
+
+# 3d plot of months with shapes as participant type
+rgl.open()
+rgl.bg(color="white")
+rgl.spheres(mainTable_didall_syn$trunk_fit_mixed,mainTable_didall_syn$head_fit_mixed,mainTable_didall_syn$room_fit_mixed,r=1,color=as.integer(mainTable_didall_syn$bestfit_mixed)+1)
+shapelist3d(tetrahedron3d(),mainTable_didall_con$trunk_fit_mixed,mainTable_didall_con$head_fit_mixed,mainTable_didall_con$room_fit_mixed,size=1,color=as.integer(mainTable_didall_con$bestfit_mixed)+1)
+
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="months - spheres=syn, triangles=con, colour=bestfit",xlab="trunk",ylab="head",zlab="room")
+browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl", "webGL"), 
+                                      width=700,height=700), sep=""))
+
+# TINKERING ---------------------------------------------------------------
+
+### TINKER here - playing with ellipsoids
 open3d()
-
 meanvec=c(mean(fitClu$trunk_fit_mixed),mean(fitClu$head_fit_mixed),mean(fitClu$room_fit_mixed))
 sigma=cov(dat)
 plot3d(ellipse3d(x=sigma,alpha=0.1,centre=meanvec))
@@ -704,20 +863,113 @@ browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"),
 
 ##
 
-## clustering furthest 
-fitcluna_both = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_fur)==0)
-fitcluna = which(is.na(mainTable$trunk_fit_fur)==0)
+# clustering --------------------------------------------------------------
+
+
+## clustering mixed with distance labels /new
+fitcluna_both = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_mixed)==0)
+fitcluna = which(is.na(mainTable$trunk_fit_mixed)==0)
 fitClu = mainTable[fitcluna,]
 fitClu_both = mainTable[fitcluna_both,]
 
-cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_month))
-clu2 = hclust(dist(fitClu[c("trunk_fit_fur","head_fit_fur","room_fit_fur")]),method="ward.D")
+cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_month),as.character(fitClu$ratio_month))
+clu2 = hclust(dist(fitClu[c("trunk_fit_mixed","head_fit_mixed","room_fit_mixed")]),method="ward.D")
 plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
 groups = cutree(clu2,3)
 rect.hclust(clu2, k=3, border="red")
 
 
-#mixed fit clustering
+## clustering mixed with mixed labels /new
+fitcluna_both = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_mixed)==0)
+fitcluna = which(is.na(mainTable$trunk_fit_mixed)==0)
+fitClu = mainTable[fitcluna,]
+fitClu_both = mainTable[fitcluna_both,]
+
+cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_mixed),as.character(fitClu$best_ratio_mixed))
+clu2 = hclust(dist(fitClu[c("trunk_fit_mixed","head_fit_mixed","room_fit_mixed")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+## clustering distance with distance labels /new
+fitcluna_both = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_month)==0)
+fitcluna = which(is.na(mainTable$trunk_fit_month)==0)
+fitClu = mainTable[fitcluna,]
+fitClu_both = mainTable[fitcluna_both,]
+
+cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_month),as.character(fitClu$ratio_month))
+clu2 = hclust(dist(fitClu[c("trunk_fit_month","head_fit_month","room_fit_month")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+## clustering distance with mixed labels /new
+fitcluna_both = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_month)==0)
+fitcluna = which(is.na(mainTable$trunk_fit_month)==0)
+fitClu = mainTable[fitcluna,]
+fitClu_both = mainTable[fitcluna_both,]
+
+cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_mixed),as.character(fitClu$best_ratio_mixed))
+clu2 = hclust(dist(fitClu[c("trunk_fit_month","head_fit_month","room_fit_month")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+## clustering crazy reg with reg labels
+fitcluna_both_cr = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_reg_cr)==0)
+fitcluna_cr = which(is.na(mainTable$trunk_fit_reg_cr)==0)
+fitClu_cr = mainTable[fitcluna_cr,]
+fitClu_both_cr = mainTable[fitcluna_both_cr,]
+
+cluLabels = paste(as.character(fitClu_cr$participant),as.character(fitClu_cr$bestfit_reg_cr),as.character(fitClu_cr$best_ratio_reg_cr))
+clu2 = hclust(dist(fitClu_cr[c("trunk_fit_reg_cr","head_fit_reg_cr","room_fit_reg_cr")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+## clustering crazy reg with dist labels
+fitcluna_both_cr = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_reg_cr)==0)
+fitcluna_cr = which(is.na(mainTable$trunk_fit_reg_cr)==0)
+fitClu_cr = mainTable[fitcluna_cr,]
+fitClu_both_cr = mainTable[fitcluna_both_cr,]
+
+cluLabels = paste(as.character(fitClu_cr$participant),as.character(fitClu_cr$bestfit_horse),as.character(fitClu_cr$ratio_crazy))
+clu2 = hclust(dist(fitClu_cr[c("trunk_fit_reg_cr","head_fit_reg_cr","room_fit_reg_cr")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+## clustering crazy dist with reg labels
+fitcluna_both_cr = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_horse)==0)
+fitcluna_cr = which(is.na(mainTable$trunk_fit_horse)==0)
+fitClu_cr = mainTable[fitcluna_cr,]
+fitClu_both_cr = mainTable[fitcluna_both_cr,]
+
+cluLabels = paste(as.character(fitClu_cr$participant),as.character(fitClu_cr$bestfit_reg_cr),as.character(fitClu_cr$best_ratio_reg_cr))
+clu2 = hclust(dist(fitClu_cr[c("trunk_fit_horse","head_fit_horse","room_fit_horse")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+## clustering crazy dist with dist labels
+fitcluna_both_cr = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_horse)==0)
+fitcluna_cr = which(is.na(mainTable$trunk_fit_horse)==0)
+fitClu_cr = mainTable[fitcluna_cr,]
+fitClu_both_cr = mainTable[fitcluna_both_cr,]
+
+cluLabels = paste(as.character(fitClu_cr$participant),as.character(fitClu_cr$bestfit_horse),as.character(fitClu_cr$ratio_crazy))
+clu2 = hclust(dist(fitClu_cr[c("trunk_fit_horse","head_fit_horse","room_fit_horse")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+#mixed fit clustering / old
 fitcluna = which(is.na(mainTable$trunk_fit_fur)==0)
 fitClu = mainTable[fitcluna,]
 
@@ -727,6 +979,20 @@ plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
 groups = cutree(clu2,3)
 rect.hclust(clu2, k=3, border="red")
 ##
+
+## clustering crazy /old
+fitcluna_both_cr = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_fur_cr)==0)
+fitcluna_cr = which(is.na(mainTable$trunk_fit_fur_cr)==0)
+fitClu_cr = mainTable[fitcluna_cr,]
+fitClu_both_cr = mainTable[fitcluna_both_cr,]
+
+cluLabels = paste(as.character(fitClu_cr$participant),as.character(fitClu_cr$bestfit_horse))
+clu2 = hclust(dist(fitClu_cr[c("trunk_fit_fur_cr","head_fit_fur_cr","room_fit_fur_cr")]),method="ward.D")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
 
 ##kmeans
 # K-Means Cluster Analysis
@@ -738,6 +1004,8 @@ fitClu["kmeans"]=NA
 
 fitClu$kmeans = fitkm$cluster
 
+
+#manovas - additional analysis to cluster analysis 
 fitmanova = manova(cbind(fitClu$trunk_fit_fur,fitClu$head_fit_fur,fitClu$room_fit_fur)~factor(fitClu$bestfit_fur))
 summary.manova(fitmanova, test="Wilks")
 
@@ -831,7 +1099,35 @@ with(pooled_month,cohensD(overall~type))
 with(pooled_crazy,cohensD(overall~type))
 
 
+
+# comparisons crazy vs months ---------------------------------------------
+
+mainTable_didall = subset(mainTable,rounds=="both")
+t.test(mainTable_didall$trunk_fit_mixed,mainTable_didall$trunk_fit_reg_cr,paired = T)
+t.test(mainTable_didall$head_fit_mixed,mainTable_didall$head_fit_reg_cr,paired = T)
+t.test(mainTable_didall$room_fit_mixed,mainTable_didall$room_fit_reg_cr,paired = T)
+
+# converting to long format for anova's
+# http://www.cookbook-r.com/Statistical_analysis/ANOVA/
+library("reshape2", lib.loc="~/R/win-library/3.2")
+mainTable_didall_long = melt(mainTable_didall,id.vars = c("participant","type"), measure.vars = c("trunk_fit_mixed","trunk_fit_reg_cr"))
+aov_trunk = aov(data=mainTable_didall_long, value ~ type*variable + Error(participant/variable))
+summary(aov_trunk)
+
+mainTable_didall_long = melt(mainTable_didall,id.vars = c("participant","type"), measure.vars = c("head_fit_mixed","head_fit_reg_cr"))
+aov_head = aov(data=mainTable_didall_long, value ~ type*variable + Error(participant/variable))
+summary(aov_head)
+
+mainTable_didall_long = melt(mainTable_didall,id.vars = c("participant","type"), measure.vars = c("room_fit_mixed","room_fit_reg_cr"))
+aov_room = aov(data=mainTable_didall_long, value ~ type*variable + Error(participant/variable))
+summary(aov_room)
+
+# final save etc ----------------------------------------------------------
+
 #loading summary info and saving as Rda file for load into markdown #move this at the end of script
 participantSummary = read.csv("participants.csv",head=TRUE,sep=";")
 
 save(participantSummary,wholedata,systemOutlierCount,advOutliers,pooledSummary,sumpool,means,shiftedMeans,fitAllRF,mainTable,wholedout_mini,fitmanova,file="data.Rda")
+
+save(aov_trunk,aov_head,aov_room,file="data2.Rda")
+
