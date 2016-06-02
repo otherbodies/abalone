@@ -65,6 +65,11 @@ All system outlier trials are listed in the file *systemOutliers.csv*
 There were `r nrow(systemOutlierCount)` system outliers, which is `r (100*nrow(systemOutlierCount)/nrow(subset(wholedata,condition!="sys")))`% of all data points. 
 
 
+For experiment 1 there were 32 system outliers
+For experiment 2 (wITH mini) there were 189 system outliers
+For experiment 2 (WITHOUT mini) there were 141 system outliers
+
+
 **IMPORTANT: For Co1 months head condition all datapoints for September are outliers. This results in missing value for this month/condition in all subsequent analyses!** 
 
 

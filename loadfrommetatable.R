@@ -139,6 +139,18 @@ systemOutlierCount = subset(wholedata, condition !="sys" & (outlier=="1")) #list
 write.table(systemOutlierCount, "systemOutliers.csv", sep=";", row.names = FALSE)
 nrow(systemOutlierCount) #number of system outliers
 
+# system outliers per experiment (in 2 experiment write-up of the paper)
+systemOutlierCount_exp1 = subset(systemOutlierCount,type=="synaesthete" & task=="month")
+systemOutlierCount_exp2 = subset(systemOutlierCount,rounds=="both")
+systemOutlierCount_exp2_nomini = subset(systemOutlierCount,rounds=="both" & task!="mini")
+# proportion of ourliers per experiment (in 2 experiment write-up of the paper)
+wholedata_exp1 = subset(wholedata, condition!="sys" & type=="synaesthete" & task=="month")
+wholedata_exp2 = subset(wholedata, condition!="sys" & rounds=="both")
+wholedata_exp2_nomini = subset(wholedata, condition!="sys" & rounds=="both" & task!="mini")
+(nrow(systemOutlierCount_exp1)*100)/nrow(wholedata_exp1)
+(nrow(systemOutlierCount_exp2)*100)/nrow(wholedata_exp2)
+(nrow(systemOutlierCount_exp2_nomini)*100)/nrow(wholedata_exp2_nomini)
+
 
 ## advanced outlier procedure - NEW
 library(plyr)
@@ -737,6 +749,8 @@ browseURL(paste("file://", writeWebGL(dir=file.path(tempdir(), "webGL"),
 mainTable_didall = subset(mainTable,rounds=="both")
 mainTable_didall_syn = subset(mainTable,rounds=="both" & type=="synaesthete")
 mainTable_didall_con = subset(mainTable,rounds=="both" & type=="control")
+mainTable_syn_mon = subset(mainTable,type=="synaesthete" & (rounds=="both" | rounds=="monthsOnly"))
+mainTable_syn = subset(mainTable,type=="synaesthete")
 
 x = mainTable_didall$trunk_fit_reg_cr
 y = mainTable_didall$head_fit_reg_cr
@@ -755,6 +769,7 @@ mainTable_didall_syn$bestfit_reg_cr = factor(mainTable_didall_syn$bestfit_reg_cr
 mainTable_didall_syn$bestfit_mixed = factor(mainTable_didall_syn$bestfit_mixed)
 mainTable_didall_con$bestfit_reg_cr = factor(mainTable_didall_con$bestfit_reg_cr)
 mainTable_didall_con$bestfit_mixed = factor(mainTable_didall_con$bestfit_mixed)
+mainTable_syn_mon$bestfit_mixed = factor(mainTable_syn_mon$bestfit_mixed)
 
 # 3d plot of both months and crazy with lines connecting them
 rgl.open()
@@ -832,14 +847,57 @@ browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl_months_rv",
 # 3d plot of months with shapes as participant type
 rgl.open()
 rgl.bg(color="white")
-rgl.spheres(mainTable_didall_syn$trunk_fit_mixed,mainTable_didall_syn$head_fit_mixed,mainTable_didall_syn$room_fit_mixed,r=1,color=as.integer(mainTable_didall_syn$bestfit_mixed)+1)
-shapelist3d(tetrahedron3d(),mainTable_didall_con$trunk_fit_mixed,mainTable_didall_con$head_fit_mixed,mainTable_didall_con$room_fit_mixed,size=1,color=as.integer(mainTable_didall_con$bestfit_mixed)+1)
+rgl.spheres(mainTable_didall_syn$trunk_fit_mixed,mainTable_didall_syn$head_fit_mixed,mainTable_didall_syn$room_fit_mixed,r=3,color=as.integer(mainTable_didall_syn$bestfit_mixed)+1)
+shapelist3d(tetrahedron3d(),mainTable_didall_con$trunk_fit_mixed,mainTable_didall_con$head_fit_mixed,mainTable_didall_con$room_fit_mixed,size=3,color=as.integer(mainTable_didall_con$bestfit_mixed)+1)
 
 rgl.points(x=c(0,0,0),color="black")
 axes3d()
-title3d(main="months - spheres=syn, triangles=con, colour=bestfit",xlab="trunk",ylab="head",zlab="room")
+title3d(main="months - spheres=syn, triangles=con, colour=bestfit") #,xlab="trunk",ylab="head",zlab="room")
+mtext3d("trunk",edge="x",pos=c(0,0,-50))
+mtext3d("head",edge="y",pos=c(-40,0,0))
+mtext3d("room",edge="z",pos=c(-10,-40,0))
 browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl", "webGL"), 
-                                      width=700,height=700), sep=""))
+                                      width=800,height=800), sep=""))
+
+
+
+# 3d plot of months with shapes as participant type but with 14 syn and 10 controls
+rgl.open()
+rgl.bg(color="white")
+rgl.spheres(mainTable_syn$trunk_fit_mixed,mainTable_syn$head_fit_mixed,mainTable_syn$room_fit_mixed,r=3,color=as.integer(mainTable_syn$bestfit_mixed)+1)
+shapelist3d(tetrahedron3d(),mainTable_didall_con$trunk_fit_mixed,mainTable_didall_con$head_fit_mixed,mainTable_didall_con$room_fit_mixed,size=3,color=as.integer(mainTable_didall_con$bestfit_mixed)+1)
+
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="months - spheres=syn, triangles=con, colour=bestfit") #,xlab="trunk",ylab="head",zlab="room")
+mtext3d("trunk",edge="x",pos=c(0,0,-50))
+mtext3d("head",edge="y",pos=c(-40,0,0))
+mtext3d("room",edge="z",pos=c(-10,-40,0))
+
+movie3d(spin3d(axis = c(0, 0, 1)), duration = 3,
+        dir = getwd())
+
+#browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl", "webGL"), 
+                                  #    width=800,height=800), sep=""))
+
+
+# preparing for plot - sa5 and sa21 separate highlight
+separ = subset(mainTable_syn_mon, participant=="Sa5" | participant=="Sa21")
+x = 3.3 #asterisk distance
+# 3d plot of months - 14 synaesthetes only
+rgl.open()
+rgl.bg(color="white")
+rgl.spheres(mainTable_syn_mon$trunk_fit_mixed,mainTable_syn_mon$head_fit_mixed,mainTable_syn_mon$room_fit_mixed,r=3,color=as.integer(mainTable_syn_mon$bestfit_mixed)+1)
+shapelist3d(octahedron3d(),separ$trunk_fit_mixed+x,separ$head_fit_mixed+x,separ$room_fit_mixed+x,size=1.5,color=as.integer(separ$bestfit_mixed)+1)
+
+rgl.points(x=c(0,0,0),color="black")
+axes3d()
+title3d(main="months - 14 synaesthetes, colour=bestfit") #,xlab="trunk",ylab="head",zlab="room")
+mtext3d("trunk",edge="x",pos=c(0,0,-50))
+mtext3d("head",edge="y",pos=c(-40,0,0))
+mtext3d("room",edge="z",pos=c(-10,-40,0))
+browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl-14syn", "webGL"), 
+                                      width=800,height=800), sep=""))
 
 # TINKERING ---------------------------------------------------------------
 
