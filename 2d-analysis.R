@@ -3,6 +3,54 @@ lengths2d = aggregate(data2d[c("mouse_x","mouse_y")],data2d[c("month_no","user_i
 means_sds2d = aggregate(sds2d[c("mouse_x","mouse_y")],sds2d[c("user_id")],mean)
 
 
+## TODO: compute outliers
+# means per month/participant
+means2d = aggregate(data2d[c("mouse_x","mouse_y")],data2d[c("month_no","user_id")],mean)
+
+# distances of each point from mean
+
+
+# SD of those distances
+# which points are more than 2.5 SD  
+
+## advanced outlier procedure - NEW
+library(plyr)
+advOutlierRemoval2d = function(subs){
+  
+  localMean = c(mean(subs$mouse_x),mean(subs$mouse_y))
+  distanceList =  data.frame(distances=numeric(nrow(subs))) 
+  
+  for (i in 1:nrow(subs)){
+    localPoint = c(subs$mouse_x[i],subs$mouse_y[i])
+    distance = dist(rbind(localMean,localPoint))
+    distanceList$distances[i]=distance[1]
+  }
+  
+  avDist = mean(distanceList$distance)
+  
+  for(i in 1:nrow(subs)){
+    
+    outlierRatio = distanceList$distances[i]/avDist
+    if (outlierRatio>2.5){
+      subs$outlier[i] = 1
+    }
+  }
+  return(subs)
+}
+
+outlier2d = data2d[,-c(2,3)]
+outlier2d$outlier = 0 
+
+test = ddply(outlier2d,.(user_id,month_no),advOutlierRemoval2d)
+
+outlier2d_count = subset(test,outlier==1)
+
+#outlier2d2 = subset(outlier2d,user_id=="Co1_2D" & month_no=="mar")
+#test2 = advOutlierRemoval2d((outlier2d2))
+
+
+##
+
 
 write.table(means_sds2d, file = "sds2d.csv", sep=";", row.names = FALSE)
 

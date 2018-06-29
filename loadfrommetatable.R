@@ -771,6 +771,11 @@ mainTable_didall_con$bestfit_reg_cr = factor(mainTable_didall_con$bestfit_reg_cr
 mainTable_didall_con$bestfit_mixed = factor(mainTable_didall_con$bestfit_mixed)
 mainTable_syn_mon$bestfit_mixed = factor(mainTable_syn_mon$bestfit_mixed)
 
+
+# NB! plotting library changed and the code doesn't work anymore for webgl. Rewritting is in 3dplotting.R
+
+library("rgl", lib.loc="~/R/win-library/3.2")
+
 # 3d plot of both months and crazy with lines connecting them
 rgl.open()
 rgl.bg(color="white")
@@ -857,7 +862,9 @@ mtext3d("trunk",edge="x",pos=c(0,0,-50))
 mtext3d("head",edge="y",pos=c(-40,0,0))
 mtext3d("room",edge="z",pos=c(-10,-40,0))
 browseURL(paste("file://", writeWebGL(dir=file.path("c://BERGEN//rgl", "webGL"), 
-                                      width=800,height=800), sep=""))
+  width=800,height=800), sep=""))
+
+
 
 
 
@@ -944,10 +951,24 @@ fitClu = mainTable[fitcluna,]
 fitClu_both = mainTable[fitcluna_both,]
 
 cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_mixed),as.character(fitClu$best_ratio_mixed))
-clu2 = hclust(dist(fitClu[c("trunk_fit_mixed","head_fit_mixed","room_fit_mixed")]),method="ward.D")
+clu2 = hclust(dist(fitClu[c("trunk_fit_mixed","head_fit_mixed","room_fit_mixed")]),method="ward.D2")
 plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
 groups = cutree(clu2,3)
 rect.hclust(clu2, k=3, border="red")
+
+
+## clustering mixed with mixed labels /new - 10-10
+fitcluna = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_mixed)==0)
+
+fitClu = mainTable[fitcluna,]
+
+
+cluLabels = paste(as.character(fitClu$participant),as.character(fitClu$bestfit_mixed),as.character(fitClu$best_ratio_mixed))
+clu2 = hclust(dist(fitClu[c("trunk_fit_mixed","head_fit_mixed","room_fit_mixed")]),method="ward.D2")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
 
 
 ## clustering distance with distance labels /new
@@ -983,8 +1004,20 @@ fitClu_cr = mainTable[fitcluna_cr,]
 fitClu_both_cr = mainTable[fitcluna_both_cr,]
 
 cluLabels = paste(as.character(fitClu_cr$participant),as.character(fitClu_cr$bestfit_reg_cr),as.character(fitClu_cr$best_ratio_reg_cr))
-clu2 = hclust(dist(fitClu_cr[c("trunk_fit_reg_cr","head_fit_reg_cr","room_fit_reg_cr")]),method="ward.D")
+clu2 = hclust(dist(fitClu_cr[c("trunk_fit_reg_cr","head_fit_reg_cr","room_fit_reg_cr")]),method="ward.D2")
 plot(clu2,labels=cluLabels,main="hierarchical cluster ward")
+groups = cutree(clu2,3)
+rect.hclust(clu2, k=3, border="red")
+
+
+## clustering crazy reg with reg labels 10-10
+fitcluna_cr = which(mainTable$rounds=="both" & is.na(mainTable$trunk_fit_reg_cr)==0)
+
+fitClu_cr = mainTable[fitcluna_cr,]
+
+cluLabels = paste(as.character(fitClu_cr$participant),as.character(fitClu_cr$bestfit_reg_cr),as.character(fitClu_cr$best_ratio_reg_cr))
+clu2 = hclust(dist(fitClu_cr[c("trunk_fit_reg_cr","head_fit_reg_cr","room_fit_reg_cr")]),method="ward.D2")
+plot(clu2,labels=cluLabels,main="hierarchical cluster ward2")
 groups = cutree(clu2,3)
 rect.hclust(clu2, k=3, border="red")
 
